@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print, prefer_const_constructors
+// ignore_for_file: avoid_print, prefer_const_constructors, use_key_in_widget_constructors
 
 import 'dart:async';
 import 'dart:convert';
@@ -9,13 +9,17 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:news_app/category.dart';
+import 'package:news_app/favorite.dart';
 import 'package:news_app/inappwebview.dart';
+import 'package:news_app/profile.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'login.dart';
 
 bool loading = true;
+String categoryyy = "business";
+// ignore: prefer_typing_uninitialized_variables
 
-// ignore: use_key_in_widget_constructors, must_be_immutable
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -27,12 +31,11 @@ class _HomeState extends State<Home> {
     // ignore: todo
     // TODO: implement initState
     super.initState();
-
     calling();
   }
 
   void calling() async {
-    await getNews();
+    await getNews(categoryyy);
     setState(() {
       loading = false;
     });
@@ -66,42 +69,53 @@ class _HomeState extends State<Home> {
     categry = CategoryModel("sports",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkgRobyLN82AlOxu2AvputX63kMGNnUo4hYw&usqp=CAU");
     category.add(categry);
+
 //addition of all category done
 
     return Scaffold(
-      drawer: Drawer(
-        // ignore: avoid_unnecessary_containers
-        child: Container(
-          child: Column(
-            // ignore: prefer_const_literals_to_create_immutables
-            children: [
-              Image.network(
-                "https://i.ytimg.com/vi/ryUxrFUk6MY/maxresdefault.jpg",
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Text(
-                "Muhammad Azhar8939",
-                style: TextStyle(fontSize: 20),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Text(
-                "azhar03067104663@gmail.com",
-                style: TextStyle(fontSize: 20),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Text(
-                "trying to be a software developer",
-                style: TextStyle(fontSize: 20, color: Colors.red),
-              ),
-            ],
+      bottomNavigationBar: BottomNavigationBar(
+        // ignore: prefer_const_literals_to_create_immutables
+        items: [
+          BottomNavigationBarItem(
+            icon: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Home(),
+                    ),
+                  );
+                },
+                child: Icon(Icons.home_filled)),
+            label: "Home",
           ),
-        ),
+          BottomNavigationBarItem(
+            icon: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Favorite(),
+                    ),
+                  );
+                },
+                child: Icon(Icons.favorite)),
+            label: "Favorite",
+          ),
+          BottomNavigationBarItem(
+            icon: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Profile(),
+                    ),
+                  );
+                },
+                child: Icon(Icons.person)),
+            label: "Profile",
+          ),
+        ],
       ),
       appBar: AppBar(
         title: Row(
@@ -143,18 +157,26 @@ class _HomeState extends State<Home> {
                     ),
                     // ignore: avoid_unnecessary_containers
                     Container(
-                      child: ListView.builder(
-                        itemCount: articles.length,
-                        shrinkWrap: true,
-                        physics: const ClampingScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          return BlogTile(
-                              articles[index].urlToImage,
-                              articles[index].title,
-                              articles[index].description,
-                              articles[index].url);
-                        },
-                      ),
+                      child: articles.isEmpty
+                          // ignore: avoid_unnecessary_containers
+                          ? Center(
+                              child: AlertDialog(
+                                title: Text(
+                                    "No News Available at this Time Kindly wait a second or try other category THANK YOU!"),
+                              ),
+                            )
+                          : ListView.builder(
+                              itemCount: articles.length,
+                              shrinkWrap: true,
+                              physics: const ClampingScrollPhysics(),
+                              itemBuilder: (context, index) {
+                                return BlogTile(
+                                    articles[index].urlToImage,
+                                    articles[index].title,
+                                    articles[index].description,
+                                    articles[index].url);
+                              },
+                            ),
                     )
                   ],
                 ),
@@ -165,24 +187,30 @@ class _HomeState extends State<Home> {
 }
 //creating category section
 
-class CategoryTile extends StatelessWidget {
+class CategoryTile extends StatefulWidget {
   final String imageUrl, categoryName;
-// ignore: prefer_const_constructors_in_immutables, use_key_in_widget_constructors
+// ignore: prefer_const_constructors_in_immutables,
   CategoryTile(this.imageUrl, this.categoryName);
+
+  @override
+  State<CategoryTile> createState() => _CategoryTileState();
+}
+
+class _CategoryTileState extends State<CategoryTile> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () async {
-        await Navigator.push(
+      onTap: () {
+        categoryyy = widget.categoryName;
+        Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => CategoryNewsSection(
-              categoryy: categoryName,
-            ),
-          ),
+          MaterialPageRoute(builder: (context) {
+            articles.clear();
+            return CategoryNewsSection(
+              categoryy: categoryyy,
+            );
+          }),
         );
-
-        print(articles.isEmpty);
       },
       child: Container(
         margin: const EdgeInsets.only(right: 16),
@@ -191,7 +219,7 @@ class CategoryTile extends StatelessWidget {
           children: <Widget>[
             ClipRRect(
               child: CachedNetworkImage(
-                imageUrl: imageUrl,
+                imageUrl: widget.imageUrl,
                 width: 120,
                 height: 60,
                 fit: BoxFit.cover,
@@ -206,7 +234,7 @@ class CategoryTile extends StatelessWidget {
                   borderRadius: BorderRadius.circular(7),
                   color: Colors.black45),
               child: Text(
-                categoryName,
+                widget.categoryName,
                 style: const TextStyle(
                     color: Colors.white,
                     fontSize: 14,
@@ -247,12 +275,15 @@ class NewsApi {
 
 List<NewsApi> articles = [];
 
-Future<void> getNews() async {
+Future<void> getNews(String catg) async {
   try {
-    String apikey =
-        "https://newsapi.org/v2/top-headlines?country=us&apiKey=f76afcf58a4e42fea62d8eacc3cb0e5d";
+    print(catg);
     // String apikey =
-    //     "https://newsapi.org/v2/top-headlines?country=us&apiKey=f24e415df31341a19f07541381594335";
+    //     "https://newsapi.org/v2/top-headlines?category=$catg&apiKey=f76afcf58a4e42fea62d8eacc3cb0e5d";
+    // String apikey =
+    //     "https://newsapi.org/v2/top-headlines?country=&apiKey=f76afcf58a4e42fea62d8eacc3cb0e5d";
+    String apikey =
+        "https://newsapi.org/v2/top-headlines?category=$catg&country=us&apiKey=f24e415df31341a19f07541381594335";
 
     print(apikey);
 
@@ -274,22 +305,17 @@ Future<void> getNews() async {
           }
         },
       );
-    } else {
-      AlertDialog(
-        title: Text("Error In Api"),
-      );
     }
   } catch (e) {
-    print(e.toString());
+    print(e);
     // print(apikey);
   }
 }
 
 //Now creating UI for news
-// ignore: use_key_in_widget_constructors
 class BlogTile extends StatefulWidget {
   final String imageUrl, title, desc, url;
-  // ignore: prefer_const_constructors_in_immutables, use_key_in_widget_constructors
+  // ignore: prefer_const_constructors_in_immutables,
   BlogTile(this.imageUrl, this.title, this.desc, this.url);
 
   @override
@@ -317,10 +343,14 @@ class _BlogTileState extends State<BlogTile> {
               width: MediaQuery.of(context).size.width,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
-                child: Image.network(
-                  widget.imageUrl,
+                child: CachedNetworkImage(
+                  imageUrl: widget.imageUrl,
+                  placeholder: (context, url) => CircularProgressIndicator(),
+                  errorWidget: (context, url, error) => Image.network(
+                    "https://www.prestashop.com/sites/default/files/styles/blog_750x320/public/blog/2019/10/banner_error_404.jpg?itok=eAS4swln",
+                    fit: BoxFit.cover,
+                  ),
                   fit: BoxFit.cover,
-                  filterQuality: FilterQuality.high,
                 ),
               ),
             ),
@@ -341,10 +371,28 @@ class _BlogTileState extends State<BlogTile> {
               ),
             ),
             GestureDetector(
-              onTap: () {
+              onTap: () async {
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                var email = prefs.getString('email');
+                SharedPreferences preferences =
+                    await SharedPreferences.getInstance();
+                preferences.setString('title', widget.title);
+                preferences.setString('description', widget.desc);
+                preferences.setString('urlToImage', widget.imageUrl);
+                preferences.setString('url', widget.url);
+                print(email);
+
+                dataa.add(FavoriteNews(
+                  title: preferences.getString('title'),
+                  description: preferences.getString('description'),
+                  urlToImage: preferences.getString('urlToImage'),
+                  url: preferences.getString('url'),
+                ));
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Login()),
+                  MaterialPageRoute(
+                    builder: (context) => email == null ? Login() : Favorite(),
+                  ),
                 );
               },
               child: Container(
@@ -352,6 +400,7 @@ class _BlogTileState extends State<BlogTile> {
                   child: Icon(
                     Icons.favorite,
                     size: 30,
+                    color: Colors.red,
                   )),
             )
           ],
@@ -360,3 +409,17 @@ class _BlogTileState extends State<BlogTile> {
     );
   }
 }
+
+class FavoriteNews {
+  String? title;
+  String? description;
+  String? url;
+  String? urlToImage;
+  FavoriteNews(
+      {required this.title,
+      required this.description,
+      required this.urlToImage,
+      required this.url});
+}
+
+List<FavoriteNews> dataa = [];

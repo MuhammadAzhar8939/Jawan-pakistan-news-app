@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:news_app/category.dart';
+import 'package:news_app/favorite.dart';
 import 'package:news_app/home.dart';
 import 'package:news_app/login.dart';
+import 'package:news_app/profile.dart';
 import 'package:news_app/sign_up.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // ignore: avoid_print
+
   runApp(MyApp());
 }
 
 // ignore: use_key_in_widget_constructors
 class MyApp extends StatelessWidget {
+  // ignore: use_key_in_widget_constructors
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
   @override
   Widget build(BuildContext context) {
@@ -36,6 +43,11 @@ class MyApp extends StatelessWidget {
               "/Home": (context) => Home(),
               "/Login": (context) => Login(),
               "/SignUp": (context) => SignUp(),
+              "/category": (context) => CategoryNewsSection(
+                    categoryy: "general",
+                  ),
+              "/Favorite": (context) => Favorite(),
+              "/profile": (context) => Profile(),
             },
           );
         }

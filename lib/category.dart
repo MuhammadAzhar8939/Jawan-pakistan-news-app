@@ -1,7 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -9,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'home.dart';
 
 bool loading = true;
+// ignore: prefer_typing_uninitialized_variables
 
 // ignore: use_key_in_widget_constructors, must_be_immutable
 class CategoryNewsSection extends StatefulWidget {
@@ -29,9 +29,7 @@ class _CategoryNewsSectionState extends State<CategoryNewsSection> {
     calling();
   }
 
-  // ignore: use_key_in_widget_constructors
-
-  void calling() async {
+  calling() async {
     // ignore: avoid_print
     print(widget.categoryy);
     await getNews(widget.categoryy);
@@ -68,17 +66,25 @@ class _CategoryNewsSectionState extends State<CategoryNewsSection> {
           : SingleChildScrollView(
               // ignore: avoid_unnecessary_containers
               child: Container(
-                child: ListView.builder(
-                    itemCount: articles.length,
-                    shrinkWrap: true,
-                    physics: const ClampingScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      return BlogTile(
-                          articles[index].urlToImage,
-                          articles[index].title,
-                          articles[index].description,
-                          articles[index].url);
-                    }),
+                child: articles.isEmpty
+                    ? Center(
+                        child: AlertDialog(
+                          title: Text(
+                              "No News Available at this Time\nKindly wait a second or try other category THANK YOU!"),
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: articles.length,
+                        shrinkWrap: true,
+                        physics: const ClampingScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          return BlogTile(
+                              articles[index].urlToImage,
+                              articles[index].title,
+                              articles[index].description,
+                              articles[index].url);
+                        },
+                      ),
               ),
             ),
     );
@@ -102,16 +108,18 @@ class NewsApi {
   );
 }
 
-late List<NewsApi> articles = [];
+List<NewsApi> articles = [];
 
 Future<void> getNews(String categoryy) async {
   // ignore: avoid_print
   print(categoryy);
+  articles.clear();
+
   try {
-    String apikey =
-        "https://newsapi.org/v2/top-headlines?category=$categoryy&apiKey=f76afcf58a4e42fea62d8eacc3cb0e5d";
     // String apikey =
-    //     "https://newsapi.org/v2/top-headlines?category=$categoryy&country=us&apiKey=f24e415df31341a19f07541381594335";
+    //     "https://newsapi.org/v2/top-headlines?category=$categoryy&apiKey=f76afcf58a4e42fea62d8eacc3cb0e5d";
+    String apikey =
+        "https://newsapi.org/v2/top-headlines?category=$categoryy&country=us&apiKey=f24e415df31341a19f07541381594335";
 
     // ignore: avoid_print
     print(apikey);
@@ -134,9 +142,9 @@ Future<void> getNews(String categoryy) async {
         },
       );
     }
-  } on HttpException catch (e) {
+  } catch (e) {
     // ignore: avoid_print
-    print(e.message);
+    print(e);
     // print(apikey);
   }
 }
