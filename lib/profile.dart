@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:news_app/login.dart';
+import 'package:news_app/photo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
@@ -220,8 +221,20 @@ class _BmwState extends State<Bmw> {
                     fit: StackFit.expand,
                     clipBehavior: Clip.none,
                     children: [
-                      CircleAvatar(
-                        backgroundImage: NetworkImage(widget.data["picURL"]),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) {
+                              return Photo(
+                                url: widget.data["picURL"],
+                              );
+                            }),
+                          );
+                        },
+                        child: CircleAvatar(
+                          backgroundImage: NetworkImage(widget.data["picURL"]),
+                        ),
                       ),
                       Positioned(
                         bottom: 0,

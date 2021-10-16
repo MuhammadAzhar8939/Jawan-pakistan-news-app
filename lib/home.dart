@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:news_app/category.dart';
@@ -374,20 +375,12 @@ class _BlogTileState extends State<BlogTile> {
               onTap: () async {
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 var email = prefs.getString('email');
-                SharedPreferences preferences =
-                    await SharedPreferences.getInstance();
-                preferences.setString('title', widget.title);
-                preferences.setString('description', widget.desc);
-                preferences.setString('urlToImage', widget.imageUrl);
-                preferences.setString('url', widget.url);
-                print(email);
-
-                dataa.add(FavoriteNews(
-                  title: preferences.getString('title'),
-                  description: preferences.getString('description'),
-                  urlToImage: preferences.getString('urlToImage'),
-                  url: preferences.getString('url'),
-                ));
+                var news = FavoriteNews(
+                    title: widget.title,
+                    description: widget.desc,
+                    urlToImage: widget.imageUrl,
+                    url: widget.url);
+                await setfavorite(news);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -410,6 +403,16 @@ class _BlogTileState extends State<BlogTile> {
   }
 }
 
+setfavorite(FavoriteNews dataa) async {
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+  await firestore.collection("favoriteNews").add({
+    "title": dataa.title,
+    "description": dataa.description,
+    "urlToImage": dataa.urlToImage,
+    "url": dataa.url
+  });
+}
+
 class FavoriteNews {
   String? title;
   String? description;
@@ -421,5 +424,3 @@ class FavoriteNews {
       required this.urlToImage,
       required this.url});
 }
-
-List<FavoriteNews> dataa = [];
