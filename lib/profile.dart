@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_unnecessary_containers, prefer_const_constructors
 
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,6 +11,7 @@ import 'package:news_app/login.dart';
 import 'package:news_app/photo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:cached_network_image/cached_network_image.dart';
 
 // ignore: prefer_typing_uninitialized_variables
 
@@ -205,121 +207,143 @@ class _BmwState extends State<Bmw> {
         ),
         elevation: 0.0,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            children: [
-              Text("\nYou can edit profile by clicking camera icon"),
-              SizedBox(
-                height: 10,
-              ),
-              Center(
-                child: SizedBox(
-                  height: 150,
-                  child: Stack(
-                    fit: StackFit.expand,
-                    clipBehavior: Clip.none,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) {
-                              return Photo(
-                                url: widget.data["picURL"],
-                              );
-                            }),
-                          );
-                        },
-                        child: CircleAvatar(
-                          backgroundImage: NetworkImage(widget.data["picURL"]),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 90,
-                        child: SizedBox(
-                          width: 50,
-                          height: 50,
-                          child: FloatingActionButton(
-                            onPressed: () {
-                              pickImage();
-                            },
-                            child: Icon(
-                              Icons.photo_camera,
-                              color: Colors.white,
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(color: Colors.black),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              children: [
+                Text(
+                  "\nYou can edit profile by clicking camera icon",
+                  style: TextStyle(color: Colors.amber),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Center(
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.19,
+                    width: MediaQuery.of(context).size.width * 0.38,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      clipBehavior: Clip.none,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) {
+                                return Photo(
+                                  url: widget.data["picURL"],
+                                );
+                              }),
+                            );
+                          },
+                          // ignore: sized_box_for_whitespace
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(80),
+                            child: CachedNetworkImage(
+                              imageUrl: widget.data["picURL"],
+                              placeholder: (context, url) =>
+                                  CircularProgressIndicator(),
+                              errorWidget: (context, url, error) =>
+                                  Image.network(
+                                "https://www.prestashop.com/sites/default/files/styles/blog_750x320/public/blog/2019/10/banner_error_404.jpg?itok=eAS4swln",
+                              ),
+                              fit: BoxFit.cover,
                             ),
                           ),
                         ),
-                      )
-                    ],
+                        Positioned(
+                          bottom: 0,
+                          right: -12,
+                          child: SizedBox(
+                            width: 50,
+                            height: 50,
+                            child: FloatingActionButton(
+                              backgroundColor: Colors.orange[200],
+                              onPressed: () {
+                                pickImage();
+                              },
+                              child: Icon(
+                                Icons.photo_camera,
+                                color: Colors.black,
+                                size: 35,
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(
-                height: 50,
-              ),
-              Container(
-                decoration: BoxDecoration(
-                    border: Border.all(width: 2), color: Colors.grey[200]),
-                child: ListTile(
-                  leading: Icon(Icons.person),
-                  title: Text(
-                    widget.data["name"],
-                    style: TextStyle(fontSize: 30),
+                SizedBox(
+                  height: 50,
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(width: 2), color: Colors.grey[200]),
+                  child: ListTile(
+                    leading: Icon(Icons.person),
+                    title: Text(
+                      widget.data["name"],
+                      style: TextStyle(fontSize: 30),
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Container(
-                decoration: BoxDecoration(
-                    border: Border.all(width: 2), color: Colors.grey[200]),
-                child: ListTile(
-                  leading: Icon(Icons.person),
-                  title: Text(
-                    widget.data["about"],
-                    style: TextStyle(fontSize: 25),
+                SizedBox(
+                  height: 20,
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(width: 2), color: Colors.grey[200]),
+                  child: ListTile(
+                    leading: Icon(Icons.person),
+                    title: Text(
+                      widget.data["about"],
+                      style: TextStyle(fontSize: 25),
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Container(
-                decoration: BoxDecoration(
-                    border: Border.all(width: 2), color: Colors.grey[200]),
-                child: ListTile(
-                  leading: Icon(Icons.person),
-                  title: Text(
-                    widget.data["email"],
-                    style: TextStyle(fontSize: 25),
+                SizedBox(
+                  height: 20,
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(width: 2), color: Colors.grey[200]),
+                  child: ListTile(
+                    leading: Icon(Icons.person),
+                    title: Text(
+                      widget.data["email"],
+                      style: TextStyle(fontSize: 25),
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(
-                height: 40,
-              ),
-              Container(
-                alignment: Alignment.bottomRight,
-                child: ElevatedButton.icon(
-                    onPressed: () async {
-                      SharedPreferences preferences =
-                          await SharedPreferences.getInstance();
-                      await preferences.remove('email');
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) {
-                          return Login();
-                        }),
-                      );
-                    },
-                    icon: Icon(Icons.logout),
-                    label: Text("Logout")),
-              ),
-            ],
+                SizedBox(
+                  height: 40,
+                ),
+                Container(
+                  alignment: Alignment.bottomRight,
+                  child: ElevatedButton.icon(
+                      onPressed: () async {
+                        SharedPreferences preferences =
+                            await SharedPreferences.getInstance();
+                        await preferences.remove('email');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) {
+                            return Login();
+                          }),
+                        );
+                      },
+                      icon: Icon(Icons.logout),
+                      label: Text("Logout")),
+                ),
+              ],
+            ),
           ),
         ),
       ),

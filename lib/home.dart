@@ -2,8 +2,6 @@
 
 import 'dart:async';
 import 'dart:convert';
-// ignore: unused_import
-import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -74,6 +72,7 @@ class _HomeState extends State<Home> {
 //addition of all category done
 
     return Scaffold(
+      backgroundColor: Colors.orange[50],
       bottomNavigationBar: BottomNavigationBar(
         // ignore: prefer_const_literals_to_create_immutables
         items: [
@@ -87,7 +86,10 @@ class _HomeState extends State<Home> {
                     ),
                   );
                 },
-                child: Icon(Icons.home_filled)),
+                child: Icon(
+                  Icons.home_filled,
+                  color: Colors.amber,
+                )),
             label: "Home",
           ),
           BottomNavigationBarItem(
@@ -100,7 +102,10 @@ class _HomeState extends State<Home> {
                     ),
                   );
                 },
-                child: Icon(Icons.favorite)),
+                child: Icon(
+                  Icons.favorite,
+                  color: Colors.red,
+                )),
             label: "Favorite",
           ),
           BottomNavigationBarItem(
@@ -113,7 +118,10 @@ class _HomeState extends State<Home> {
                     ),
                   );
                 },
-                child: Icon(Icons.person)),
+                child: Icon(
+                  Icons.person,
+                  color: Colors.black,
+                )),
             label: "Profile",
           ),
         ],
@@ -225,14 +233,14 @@ class _CategoryTileState extends State<CategoryTile> {
                 height: 60,
                 fit: BoxFit.cover,
               ),
-              borderRadius: BorderRadius.circular(7),
+              borderRadius: BorderRadius.circular(10),
             ),
             Container(
               alignment: Alignment.center,
               width: 120,
               height: 60,
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(7),
+                  borderRadius: BorderRadius.circular(10),
                   color: Colors.black45),
               child: Text(
                 widget.categoryName,
@@ -343,7 +351,7 @@ class _BlogTileState extends State<BlogTile> {
               margin: const EdgeInsets.only(bottom: 10),
               width: MediaQuery.of(context).size.width,
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(15),
                 child: CachedNetworkImage(
                   imageUrl: widget.imageUrl,
                   placeholder: (context, url) => CircularProgressIndicator(),
@@ -393,7 +401,6 @@ class _BlogTileState extends State<BlogTile> {
                   child: Icon(
                     Icons.favorite,
                     size: 30,
-                    color: Colors.red,
                   )),
             )
           ],
